@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#12040b">
+<title>Pra você</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #12040b;
+    --bg-2: #2b0715;
+    --petal: #d81b4a;
+    --petal-soft: #ff6b8e;
+    --text: #f8e3e8;
+    --muted: #b995a0;
+    --leaf: #1f7a45;
+    --code-bg: #1a0710;
+    --line: rgba(248, 227, 232, .14);
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --mono: ui-monospace, "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { color-scheme: dark; }
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(120% 80% at 50% 0%, var(--bg-2) 0%, var(--bg) 60%) fixed,
+      var(--bg);
+    color: var(--text);
+    font-family: var(--serif);
+    font-size: 1.125rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 2px solid var(--petal-soft); outline-offset: 3px; border-radius: 4px; }
+
+  /* ---------- Tela trancada ---------- */
+  #lock {
+    min-height: 100vh; min-height: 100svh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1.25rem; padding: 2rem 1.25rem; text-align: center;
+  }
+  #lock svg { width: 88px; height: auto; opacity: .85; animation: respira 4.5s ease-in-out infinite; }
+  #lock h1 { font-size: clamp(2.4rem, 9vw, 4rem); font-weight: 400; font-style: italic; letter-spacing: -.01em; line-height: 1.1; }
+  #lock p { max-width: 30ch; color: var(--muted); }
+  #lock #contagem { color: var(--text); font-variant-numeric: tabular-nums; max-width: 28ch; }
+  @keyframes respira { 0%,100% { transform: scale(1); opacity: .7; } 50% { transform: scale(1.06); opacity: 1; } }
+
+  /* ---------- Abertura com a rosa ---------- */
+  #hero {
+    min-height: 100vh; min-height: 100svh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 2.5rem 1rem 1.5rem; text-align: center; position: relative;
+  }
+  #hero h1 {
+    font-size: clamp(1.9rem, 6.5vw, 3.2rem); font-weight: 400; line-height: 1.15;
+    letter-spacing: -.01em; opacity: 0; transition: opacity 2.4s ease .4s;
+  }
+  #hero.on h1 { opacity: 1; }
+  .glow {
+    position: absolute; left: 50%; top: 56%; width: min(120vw, 820px); aspect-ratio: 1;
+    transform: translate(-50%, -50%); pointer-events: none;
+    background: radial-gradient(closest-side, rgba(216, 27, 74, .26), rgba(216, 27, 74, 0) 70%);
+  }
+  #rose { position: relative; width: min(92vw, 50svh, 520px); aspect-ratio: 600 / 860; height: auto; display: block; margin-top: .75rem; }
+  .dica { margin-top: .5rem; color: var(--muted); font-size: .95rem; opacity: 0; transition: opacity 1.6s ease; }
+  #hero.done .dica { opacity: 1; }
+
+  /* ---------- Mensagem ---------- */
+  #carta { max-width: 36rem; margin: 0 auto; padding: 4.5rem 1.5rem 3rem; }
+  #carta p { font-size: clamp(1.2rem, 4.2vw, 1.45rem); line-height: 1.7; margin-bottom: 1.6rem; text-wrap: pretty; }
+  #carta p.abre { font-size: clamp(1.7rem, 6vw, 2.3rem); font-style: italic; line-height: 1.25; margin-bottom: 2rem; }
+  #carta p.fecha { font-size: clamp(2.2rem, 9vw, 3.4rem); font-style: italic; line-height: 1.1; margin: 2.8rem 0 0; color: var(--petal-soft); }
+  #assina { margin-top: 1.4rem; color: var(--muted); font-style: italic; }
+
+  /* ---------- Código ---------- */
+  #codigo { max-width: 40rem; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+  #codigo h2 { font-size: 1.5rem; font-weight: 400; font-style: italic; margin-bottom: .35rem; }
+  #codigo > p { color: var(--muted); font-size: 1rem; margin-bottom: 1.2rem; }
+  .abas { display: flex; gap: .25rem; border-bottom: 1px solid var(--line); }
+  .abas button {
+    font: inherit; font-size: 1rem; color: var(--muted); background: none; border: 0;
+    padding: .55rem 1rem; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .abas button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--petal); }
+  .abas button:hover { color: var(--text); }
+  pre#fonte {
+    background: var(--code-bg); border: 1px solid var(--line); border-top: 0;
+    padding: 1.1rem 1.1rem; font-family: var(--mono); font-size: .86rem; line-height: 1.7;
+    overflow-x: auto; min-height: 15.5rem; white-space: pre; tab-size: 4;
+  }
+  pre#fonte .ln { display: block; }
+  @media (max-width: 480px) { pre#fonte, #saida { font-size: .74rem; } }
+  .k { color: #ff7ea0; } .s { color: #f9c784; } .c { color: #8a6a74; font-style: italic; } .f { color: #8fd0ff; }
+  #saida {
+    margin-top: .9rem; background: #000; border: 1px solid var(--line); padding: .9rem 1.1rem;
+    font-family: var(--mono); font-size: .86rem; line-height: 1.7; color: #b7f5c9; min-height: 4.4rem;
+  }
+  #saida .dim { color: var(--muted); font-style: italic; }
+  #saida .render { font-family: var(--serif); color: var(--text); }
+  #saida .render b { display: block; font-size: 1.5rem; font-weight: 400; }
+  #saida .render em { color: var(--petal-soft); font-size: 1.2rem; display: inline-block; animation: bater 1.1s ease-in-out infinite; transform-origin: left center; }
+  @keyframes bater { 0%,100% { transform: scale(1); } 40% { transform: scale(1.12); } }
+
+  footer { text-align: center; color: var(--muted); font-size: .95rem; padding: 0 1rem 3rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #lock svg, #saida .render em { animation: none; }
+    #hero h1, .dica { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<noscript><p style="padding:2rem;text-align:center">Precisa do JavaScript ligado pra abrir.</p></noscript>
+
+<!-- ================= TRANCADO ================= -->
+<main id="lock">
+  <svg viewBox="0 0 100 130" fill="none" stroke="#d81b4a" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+    <path d="M50 12 C30 34 30 66 50 82 C70 66 70 34 50 12Z"/>
+    <path d="M50 22 C42 40 42 62 50 78"/>
+    <path d="M50 12 C70 28 82 50 70 72 C64 80 56 84 50 82"/>
+    <path d="M50 82 C50 100 48 112 50 126" stroke="#1f7a45"/>
+    <path d="M50 104 C40 98 32 98 26 102 C34 110 44 110 50 104Z" stroke="#1f7a45"/>
+  </svg>
+  <h1>Ainda não.</h1>
+  <p>Isso aqui abre no dia 25/10. Guarda o link, vale a espera.</p>
+  <p id="contagem" aria-live="off"></p>
+</main>
+
+<!-- ================= ABERTO ================= -->
+<div id="reveal" hidden>
+  <section id="hero">
+    <div class="glow" aria-hidden="true"></div>
+    <h1 id="titulo"></h1>
+    <canvas id="rose" role="img" aria-label="Uma rosa feita com a frase eu te amo em várias línguas"></canvas>
+    <p class="dica">Desce, tem mais.</p>
+  </section>
+
+  <section id="carta" aria-label="Mensagem"></section>
+
+  <section id="codigo">
+    <h2>Do meu jeito</h2>
+    <p>Eu sei falar com código também. Clica em cada uma.</p>
+    <div class="abas" role="tablist" aria-label="Linguagem">
+      <button role="tab" aria-selected="true" data-lang="python">Python</button>
+      <button role="tab" aria-selected="false" data-lang="java">Java</button>
+      <button role="tab" aria-selected="false" data-lang="html">HTML</button>
+    </div>
+    <pre id="fonte" tabindex="0" aria-label="Código"></pre>
+    <div id="saida" aria-live="polite"></div>
+  </section>
+
+  <footer id="rodape"></footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  /* =====================================================
+     EDITE AQUI
+     ===================================================== */
+  const CONFIG = {
+    nome: "Mozin",                             // o nome (ou apelido) dela
+    de: "",                                    // o seu nome. Deixe "" pra não assinar com nome.
+    desbloqueia: "2026-10-25T00:00:00-03:00",  // abre a partir de 25/10/2026, 00:00 (Brasília)
+    mensagem: [                                // cada item é um parágrafo. Reescreva do seu jeito.
+      "Eu queria te dizer uma coisa.",
+      "Eu não sou o cara mais bom com palavras. Sou mais de código, de tela, de erro que não some. Mas tudo que eu sei fazer eu coloquei aqui, pra você.",
+      "Eu te amo. Não é frase pronta nem coisa só de hoje. É do jeito que eu sei: de verdade, no dia comum e no dia ruim.",
+      "Você deixa a minha vida mais leve. Do seu lado, até o que dá errado parece que tem conserto.",
+      "Que esse ano que começa hoje seja seu. Com mais riso, mais paz e muita coisa boa, e eu aqui do lado vendo tudo isso acontecer.",
+      "Eu te amo em português, em inglês, em japonês e em todas as línguas que eu consegui achar. Se existir mais uma, eu aprendo."
+    ],
+    fecho: "Eu te amo."
+  };
+
+  /* "Eu te amo" em várias línguas (quem fala é um homem, pra uma mulher) */
+  const LANGS = [
+    "Eu te amo", "I love you", "Te amo", "Je t'aime", "Ti amo", "Ich liebe dich", "愛してる", "사랑해",
+    "我爱你", "Я тебя люблю", "أحبك", "मैं तुमसे प्यार करता हूँ", "Seni seviyorum", "Ik hou van je",
+    "Jag älskar dig", "Kocham cię", "Σ' αγαπώ", "אני אוהב אותך", "Rakastan sinua", "Te iubesc",
+    "Szeretlek", "Miluji tě", "Aku cinta kamu", "Mahal kita", "Nakupenda", "Anh yêu em", "ผมรักคุณ",
+    "T'estimo", "Mi amas vin", "Jeg elsker deg", "Jeg elsker dig", "Ég elska þig", "Volim te",
+    "Я тебе кохаю", "Обичам те", "دوستت دارم", "Tá grá agam duit", "Te quiero"
+  ];
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const unlockAt = Date.parse(CONFIG.desbloqueia);
+  const preview = new URLSearchParams(location.search).has("preview");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  /* ---------- Contagem e abertura ---------- */
+  const plural = (n, um, varios) => n + " " + (n === 1 ? um : varios);
+  function tick() {
+    const left = unlockAt - Date.now();
+    if (left <= 0 || preview) { reveal(); return; }
+    const t = Math.floor(left / 1000);
+    const d = Math.floor(t / 86400), h = Math.floor(t % 86400 / 3600), m = Math.floor(t % 3600 / 60), s = t % 60;
+    $("#contagem").textContent = "Faltam " + plural(d, "dia", "dias") + ", " + plural(h, "hora", "horas") + ", " +
+      plural(m, "minuto", "minutos") + " e " + plural(s, "segundo", "segundos") + ".";
+    setTimeout(tick, 500);
+  }
+
+  let opened = false;
+  function reveal() {
+    if (opened) return; opened = true;
+    $("#lock").hidden = true;
+    $("#reveal").hidden = false;
+    document.title = "Pra você";
+    window.scrollTo(0, 0);
+    $("#titulo").textContent = "Feliz aniversário, " + CONFIG.nome;
+    buildLetter();
+    buildCode();
+    footer();
+    initRose();
+  }
+
+  function buildLetter() {
+    const box = $("#carta");
+    CONFIG.mensagem.forEach((txt, i) => {
+      const p = document.createElement("p");
+      if (i === 0) p.className = "abre";
+      p.textContent = txt.replace("{nome}", CONFIG.nome);
+      box.appendChild(p);
+    });
+    const f = document.createElement("p");
+    f.className = "fecha"; f.textContent = CONFIG.fecho;
+    box.appendChild(f);
+    if (CONFIG.de) {
+      const a = document.createElement("p");
+      a.id = "assina"; a.textContent = "Com amor, " + CONFIG.de;
+      box.appendChild(a);
+    }
+  }
+
+  function footer() {
+    $("#rodape").textContent = "25/10";
+  }
+
+  /* ---------- Código (Python, Java, HTML) ---------- */
+  function buildCode() {
+    const n = esc(CONFIG.nome);
+    const K = t => `<span class="k">${t}</span>`, S = t => `<span class="s">${t}</span>`,
+          C = t => `<span class="c">${t}</span>`, F = t => `<span class="f">${t}</span>`;
+    const CODE = {
+      python: {
+        lines: [
+          C("# amor.py"),
+          `nome = ${S('"' + n + '"')}`,
+          "",
+          `${K("def")} ${F("amar")}(quanto=${F("float")}(${S('"inf"')})):`,
+          `    ${K("return")} ${S('f"Eu te amo, {nome}. Quanto? {quanto}"')}`,
+          "",
+          `${F("print")}(${S('"Feliz aniversário!"')})`,
+          `${F("print")}(amar())`
+        ],
+        out: `Feliz aniversário!\nEu te amo, ${n}. Quanto? inf`
+      },
+      java: {
+        lines: [
+          C("// Amor.java"),
+          `${K("public class")} Amor {`,
+          `    ${K("public static void")} ${F("main")}(String[] args) {`,
+          `        String nome = ${S('"' + n + '"')};`,
+          `        System.out.${F("println")}(${S('"Feliz aniversário!"')});`,
+          `        ${K("for")} (${K("int")} dia = 1; ; dia++) {`,
+          `            System.out.${F("println")}(${S('"Dia "')} + dia + ${S('": eu te amo, "')} + nome);`,
+          `            ${K("if")} (dia == 3) ${K("break")}; ${C("// só pra caber na tela")}`,
+          `        }`,
+          `    }`,
+          `}`
+        ],
+        out: `Feliz aniversário!\nDia 1: eu te amo, ${n}\nDia 2: eu te amo, ${n}\nDia 3: eu te amo, ${n}\n<span class="dim">o de verdade não tem break</span>`
+      },
+      html: {
+        lines: [
+          C("&lt;!-- amor.html --&gt;"),
+          `&lt;h1&gt;Feliz aniversário, ${n}&lt;/h1&gt;`,
+          `&lt;p class=${S('"amor"')}&gt;eu te amo&lt;/p&gt;`,
+          "",
+          `&lt;style&gt;`,
+          `  .amor { color: crimson; animation: bater 1s infinite; }`,
+          `&lt;/style&gt;`
+        ],
+        render: `<div class="render"><b>Feliz aniversário, ${n}</b><em>eu te amo</em></div>`
+      }
+    };
+
+    const pre = $("#fonte"), out = $("#saida");
+    let token = 0;
+    function show(lang) {
+      const my = ++token, d = CODE[lang];
+      pre.innerHTML = ""; out.innerHTML = "";
+      d.lines.forEach((html, i) => {
+        const row = document.createElement("span");
+        row.className = "ln"; row.innerHTML = html || " ";
+        if (reduce) { pre.appendChild(row); return; }
+        row.style.visibility = "hidden";
+        pre.appendChild(row);
+        setTimeout(() => { if (my === token) row.style.visibility = "visible"; }, 90 * i);
+      });
+      const done = () => { if (my === token) out.innerHTML = d.render ? d.render : d.out.replace(/\n/g, "<br>"); };
+      if (reduce) done(); else setTimeout(done, 90 * d.lines.length + 250);
+    }
+    document.querySelectorAll(".abas button").forEach(b => {
+      b.addEventListener("click", () => {
+        document.querySelectorAll(".abas button").forEach(x => x.setAttribute("aria-selected", x === b));
+        show(b.dataset.lang);
+      });
+    });
+    // a primeira só roda quando a pessoa chega na seção
+    let started = false;
+    const io = new IntersectionObserver(es => {
+      if (!started && es.some(e => e.isIntersecting)) { started = true; show("python"); io.disconnect(); }
+    }, { threshold: .35 });
+    io.observe($("#codigo"));
+  }
+
+  /* ---------- A rosa feita de palavras ---------- */
+  function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const easeBack = t => { const c1 = 1.4, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+  const FONT = '"Noto Sans", "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, sans-serif';
+
+  function initRose() {
+    const cv = $("#rose"), ctx = cv.getContext("2d");
+    const LW = 600, LH = 860, S = 2;
+    cv.width = LW * S; cv.height = LH * S;
+    const rnd = mulberry32(25102026);
+    const HX = 300, HY = 300;                // centro da flor
+    const mk = (w, h) => { const c = document.createElement("canvas"); c.width = Math.ceil(w * S); c.height = Math.ceil(h * S); return c; };
+
+    /* texto em arcos, em volta da base da pétala */
+    function arcText(g, L, W, fs, color) {
+      g.font = `600 ${fs}px ${FONT}`; g.textBaseline = "alphabetic";
+      const lh = fs * 1.3; let idx = Math.floor(rnd() * LANGS.length);
+      for (let r = fs * 1.5; r < L - fs * 0.15; r += lh) {
+        const half = r < W * .9 ? 1.45 : Math.min(1.45, Math.asin(Math.min(1, W * .9 / r)) + .08);
+        g.fillStyle = color(r / L);
+        idx = (idx + 3 + Math.floor(rnd() * 5)) % LANGS.length;
+        let a = -half;
+        while (a < half) {
+          const txt = LANGS[idx] + "   ·   "; idx = (idx + 1) % LANGS.length;
+          const w = g.measureText(txt).width, mid = a + (w / 2) / r;
+          g.save(); g.rotate(mid); g.translate(0, -r); g.fillText(txt, -w / 2, 0); g.restore();
+          a += w / r;
+        }
+      }
+    }
+
+    function petalPath(L, W) {
+      const p = new Path2D();
+      p.moveTo(0, 0);
+      p.bezierCurveTo(-W * 1.05, -L * .18, -W * 1.0, -L * .92, -W * .18, -L * .99);
+      p.quadraticCurveTo(0, -L * 1.04, W * .18, -L * .99);
+      p.bezierCurveTo(W * 1.0, -L * .92, W * 1.05, -L * .18, 0, 0);
+      p.closePath(); return p;
+    }
+
+    function petalSprite(L, W, lightness) {
+      const pad = 8, c = mk(2 * W + 2 * pad, L + 2 * pad), g = c.getContext("2d");
+      g.scale(S, S); g.translate(W + pad, L + pad);
+      const path = petalPath(L, W);
+      g.save(); g.clip(path);
+      const gr = g.createRadialGradient(0, 0, 0, 0, 0, L);
+      gr.addColorStop(0, "hsl(346 90% 14%)"); gr.addColorStop(.5, `hsl(348 85% ${lightness - 12}%)`); gr.addColorStop(1, `hsl(350 85% ${lightness}%)`);
+      g.fillStyle = gr; g.fillRect(-W - pad, -L - pad, 2 * W + 2 * pad, L + 2 * pad);
+      const fs = clamp(L / 16, 8, 16);
+      arcText(g, L, W, fs, k => `hsla(345 100% ${86 + k * 8}% / .93)`);
+      const sh = g.createRadialGradient(0, -L, 0, 0, -L, L * .7);
+      sh.addColorStop(0, "rgba(255,190,205,.28)"); sh.addColorStop(1, "rgba(255,190,205,0)");
+      g.fillStyle = sh; g.fillRect(-W - pad, -L - pad, 2 * W + 2 * pad, L + 2 * pad);
+      g.lineWidth = 8; g.strokeStyle = "rgba(25,0,8,.6)"; g.stroke(path);
+      g.restore();
+      g.lineWidth = 1.2; g.strokeStyle = "rgba(255,150,170,.5)"; g.stroke(path);
+      return { c, ox: W + pad, oy: L + pad };
+    }
+
+    /* pétalas, de fora pra dentro */
+    const rings = [
+      { n: 7, L: 250, W: 150, off: 0,   light: 47 },
+      { n: 6, L: 210, W: 125, off: .5,  light: 44 },
+      { n: 5, L: 168, W: 100, off: .2,  light: 41 },
+      { n: 4, L: 128, W: 76,  off: .65, light: 38 },
+      { n: 3, L: 90,  W: 56,  off: .1,  light: 35 },
+      { n: 3, L: 56,  W: 36,  off: .4,  light: 32 }
+    ];
+    const petals = [];
+    rings.forEach((r, ri) => {
+      for (let k = 0; k < r.n; k++) {
+        const L = r.L * (1 + (rnd() - .5) * .08);
+        petals.push({
+          spr: petalSprite(L, r.W, r.light),
+          ang: (k + r.off) / r.n * Math.PI * 2 + ri * .35 + (rnd() - .5) * .12
+        });
+      }
+    });
+
+    /* caule */
+    const B = { p0: [300, 470], c1: [278, 570], c2: [324, 720], p1: [300, 852] };
+    const bez = t => { const u = 1 - t; return [
+      u*u*u*B.p0[0] + 3*u*u*t*B.c1[0] + 3*u*t*t*B.c2[0] + t*t*t*B.p1[0],
+      u*u*u*B.p0[1] + 3*u*u*t*B.c1[1] + 3*u*t*t*B.c2[1] + t*t*t*B.p1[1]]; };
+    const stemCanvas = mk(LW, LH), sg = stemCanvas.getContext("2d");
+    sg.scale(S, S); sg.lineCap = "round";
+    const path = new Path2D(); path.moveTo(...B.p0); path.bezierCurveTo(...B.c1, ...B.c2, ...B.p1);
+    sg.strokeStyle = "#0c3a20"; sg.lineWidth = 22; sg.stroke(path);
+    sg.strokeStyle = "#1a6a3c"; sg.lineWidth = 17; sg.stroke(path);
+    { // texto ao longo do caule, de baixo pra cima
+      const pts = []; let acc = 0, prev = null;
+      for (let i = 0; i <= 400; i++) { const q = bez(1 - i / 400); if (prev) acc += Math.hypot(q[0] - prev[0], q[1] - prev[1]); pts.push({ x: q[0], y: q[1], s: acc }); prev = q; }
+      const at = s => { let i = 1; while (i < pts.length - 1 && pts[i].s < s) i++; const a = pts[i - 1], b = pts[i]; return { x: b.x, y: b.y, ang: Math.atan2(b.y - a.y, b.x - a.x) }; };
+      sg.font = `600 11px ${FONT}`; sg.fillStyle = "rgba(214,255,228,.95)";
+      let s = 6, i = 0; const total = acc;
+      while (s < total - 6) {
+        const txt = LANGS[i++ % LANGS.length] + "  ·  ", w = sg.measureText(txt).width, p = at(s + w / 2);
+        sg.save(); sg.translate(p.x, p.y); sg.rotate(p.ang); sg.fillText(txt, -w / 2, 3.6); sg.restore(); s += w;
+      }
+    }
+
+    /* folhas */
+    function leafSprite(L, W) {
+      const pad = 6, c = mk(L + 2 * pad, 2 * W + 2 * pad), g = c.getContext("2d");
+      g.scale(S, S); g.translate(pad, W + pad);
+      const p = new Path2D(); p.moveTo(0, 0);
+      p.bezierCurveTo(L * .2, -W * 1.25, L * .75, -W * 1.1, L, 0); p.bezierCurveTo(L * .75, W * 1.1, L * .2, W * 1.25, 0, 0); p.closePath();
+      g.save(); g.clip(p);
+      const gr = g.createLinearGradient(0, 0, L, 0); gr.addColorStop(0, "#0b3b1f"); gr.addColorStop(1, "#27a860");
+      g.fillStyle = gr; g.fillRect(-pad, -W - pad, L + 2 * pad, 2 * W + 2 * pad);
+      g.font = `600 10px ${FONT}`; g.fillStyle = "rgba(225,255,235,.88)";
+      let idx = Math.floor(rnd() * LANGS.length);
+      for (let y = -W + 6; y < W; y += 13) {
+        let x = 6 + rnd() * 20; idx = (idx + 5) % LANGS.length;
+        while (x < L) { const t = LANGS[idx] + "  ·  "; idx = (idx + 1) % LANGS.length; g.fillText(t, x, y); x += g.measureText(t).width; }
+      }
+      g.strokeStyle = "rgba(0,25,10,.45)"; g.lineWidth = 2; g.beginPath(); g.moveTo(0, 0); g.lineTo(L * .98, 0); g.stroke();
+      g.lineWidth = 7; g.strokeStyle = "rgba(0,25,10,.55)"; g.stroke(p);
+      g.restore();
+      g.lineWidth = 1.2; g.strokeStyle = "rgba(150,255,190,.4)"; g.stroke(p);
+      return { c, ox: pad, oy: W + pad };
+    }
+    const leaves = [
+      { spr: leafSprite(150, 46), at: bez(.55), ang: Math.PI + .55, t0: 1.0 },
+      { spr: leafSprite(130, 40), at: bez(.76), ang: -.55, t0: 1.35 }
+    ];
+
+    /* desenho */
+    const drawSpr = (sp, x, y, ang, k, alpha = 1) => {
+      if (k <= 0) return;
+      ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x, y); ctx.rotate(ang); ctx.scale(k, k);
+      ctx.drawImage(sp.c, -sp.ox, -sp.oy, sp.c.width / S, sp.c.height / S); ctx.restore();
+    };
+    const T_PETALS = 1.9, STAG = .12, DUR = .75;
+    const END = T_PETALS + petals.length * STAG + DUR + .1;
+
+    function drawScene(t) {
+      const sp = clamp((t - .1) / 1.4), top = 440;
+      if (sp > 0) {
+        const y = LH - (LH - top) * easeOut(sp);
+        ctx.save(); ctx.beginPath(); ctx.rect(0, y, LW, LH - y); ctx.clip();
+        ctx.drawImage(stemCanvas, 0, 0, LW, LH); ctx.restore();
+      }
+      leaves.forEach(l => drawSpr(l.spr, l.at[0], l.at[1], l.ang, easeBack(clamp((t - l.t0) / .8))));
+      petals.forEach((p, i) => {
+        const u = clamp((t - T_PETALS - i * STAG) / DUR);
+        if (u > 0) drawSpr(p.spr, HX, HY, p.ang, .2 + .8 * easeBack(u), clamp(u * 2.2));
+      });
+    }
+
+    const baked = mk(LW, LH);
+    const bakedCtx = baked.getContext("2d");
+    function bake() {
+      // desenha a cena final no canvas principal e guarda uma cópia pronta
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
+      ctx.setTransform(S, 0, 0, S, 0, 0);
+      drawScene(END + 10);
+      bakedCtx.setTransform(1, 0, 0, 1, 0, 0); bakedCtx.clearRect(0, 0, baked.width, baked.height);
+      bakedCtx.drawImage(cv, 0, 0);
+    }
+
+    const sparks = Array.from({ length: 14 }, () => ({ x: 60 + rnd() * 480, y: rnd() * LH, v: 8 + rnd() * 14, r: 1 + rnd() * 2, ph: rnd() * 6.28 }));
+    const hero = $("#hero");
+
+    if (reduce) {
+      ctx.setTransform(S, 0, 0, S, 0, 0); drawScene(END + 10);
+      hero.classList.add("on", "done"); return;
+    }
+
+    let t0 = null, last = 0, isBaked = false;
+    function frame(now) {
+      if (t0 === null) { t0 = now; hero.classList.add("on"); }
+      const t = (now - t0) / 1000, dt = Math.min(.05, (now - last) / 1000 || .016); last = now;
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
+      if (t < END) {
+        ctx.setTransform(S, 0, 0, S, 0, 0); drawScene(t);
+      } else {
+        if (!isBaked) { bake(); isBaked = true; hero.classList.add("done"); }
+        const tt = t - END;
+        ctx.setTransform(S, 0, 0, S, 0, 0);
+        ctx.save(); ctx.translate(300, 852); ctx.rotate(Math.sin(tt * .8) * .012); ctx.translate(-300, -852);
+        ctx.drawImage(baked, 0, 0, LW, LH); ctx.restore();
+        sparks.forEach(s => {
+          s.y -= s.v * dt; if (s.y < -10) { s.y = LH + 10; s.x = 60 + rnd() * 480; }
+          const a = .2 + .3 * Math.sin(s.ph + tt * 2);
+          ctx.fillStyle = `rgba(255,150,175,${a})`; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283); ctx.fill();
+        });
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  tick();
+})();
+</script>
+</body>
+</html>
